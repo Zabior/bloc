@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:clock/clock.dart';
 import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' as test;
@@ -165,6 +166,45 @@ void blocTest<B extends BlocBase<State>, State>(
         errors: errors,
         tearDown: tearDown,
       );
+    },
+    tags: tags,
+  );
+}
+
+/// [blocTest] with the mocked clock.
+/// Behaves in the same way as [blocTest] but uses the passed [clock].
+@isTest
+void blocTestWithClock<B extends BlocBase<State>, State>(
+    String description, Clock clock, {
+      required B Function() build,
+      FutureOr<void> Function()? setUp,
+      State Function()? seed,
+      dynamic Function(B bloc)? act,
+      Duration? wait,
+      int skip = 0,
+      dynamic Function()? expect,
+      dynamic Function(B bloc)? verify,
+      dynamic Function()? errors,
+      FutureOr<void> Function()? tearDown,
+      dynamic tags,
+    }) {
+  test.test(
+    description,
+        () async {
+      await withClock(clock, () async {
+        await testBloc<B, State>(
+          setUp: setUp,
+          build: build,
+          seed: seed,
+          act: act,
+          wait: wait,
+          skip: skip,
+          expect: expect,
+          verify: verify,
+          errors: errors,
+          tearDown: tearDown,
+        );
+      });
     },
     tags: tags,
   );

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:clock/clock.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -187,6 +188,23 @@ void main() {
           throwsA(isA<ErrorCounterBlocError>()),
         );
       });
+    });
+
+    group('ClockBloc', () {
+      blocTestWithClock<ClockBloc, int>(
+        'correctly process clock events',
+        Clock.fixed(
+          DateTime(2023, 11, 17),
+        ),
+        build: () => ClockBloc(),
+        act: (bloc) => bloc
+          ..add(ClockEvent.addDay)
+          ..add(ClockEvent.now),
+        expect: () => [
+          DateTime(2023, 11, 18).millisecondsSinceEpoch,
+          DateTime(2023, 11, 17).millisecondsSinceEpoch,
+        ],
+      );
     });
 
     group('AsyncCounterBloc', () {
